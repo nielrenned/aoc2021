@@ -3,7 +3,7 @@ RAW_INPUT = None
 INPUT = None
 
 def load_input(use_test_input=False):
-    global DAY, RAW_INPUT
+    global RAW_INPUT
     path = f'inputs/day{DAY}.txt'
     if use_test_input:
         path = f'inputs/day{DAY}_test.txt'
@@ -11,15 +11,13 @@ def load_input(use_test_input=False):
         RAW_INPUT = f.read()
 
 def parse_input():
-    global RAW_INPUT, INPUT
+    global INPUT
     pass
 
 def part1():
-    global INPUT
     pass
 
 def part2():
-    global INPUT
     pass
 
 def main():
