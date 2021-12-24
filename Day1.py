@@ -26,13 +26,20 @@ def part1():
 
 def part2():
     global INPUT
-    pass
+    prev = sum(INPUT[:3])
+    count = 0
+    for i in range(1, len(INPUT)-2):
+        new_sum = INPUT[i] + INPUT[i+1] + INPUT[i+2]
+        if new_sum > prev:
+            count += 1
+        prev = new_sum
+    return count
 
 def main():
     load_input()
     parse_input()
     print('PART 1:', part1())
-    # print('PART 2:', part1())
+    print('PART 2:', part2())
 
 if __name__ == "__main__":
     main()
