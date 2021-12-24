@@ -12,7 +12,18 @@ def parse_input():
     pass
 
 def part1():
+    global INPUT
     pass
 
 def part2():
+    global INPUT
     pass
+
+def main():
+    load_input()
+    parse_input()
+    part1()
+    # part2()
+
+if __name__ == "__main__":
+    main()
