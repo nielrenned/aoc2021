@@ -24,7 +24,7 @@ def main():
     load_input()
     parse_input()
     print('PART 1:', part1())
-    # print('PART 2:', part1())
+    # print('PART 2:', part2())
 
 if __name__ == "__main__":
     main()
