@@ -32,6 +32,10 @@ def part1():
 
 from functools import reduce
 
+'''
+  This map came from a by-hand analysis of the 7-segment display configuration. We
+  can figure out the wire mappings one-by-one as seen below, just by logic.
+'''
 def part2():
     total = 0
     for signal, output in INPUT:
