@@ -92,7 +92,6 @@ def packet(bits, indent=0):
                 i += sub_length
                 values.append(sub_value)
         
-        
         if type_id == 0: # sum
             value = sum(values)
         elif type_id == 1: # product
@@ -104,20 +103,11 @@ def packet(bits, indent=0):
         elif type_id == 3: # max
             value = max(values)
         elif type_id == 5: # >
-            if values[0] > values[1]:
-                value = 1
-            else:
-                value = 0
+            value = 1 if values[0] > values[1] else 0
         elif type_id == 6: # <
-            if values[0] < values[1]:
-                value = 1
-            else:
-                value = 0
+            value = 1 if values[0] < values[1] else 0
         elif type_id == 7: # ==
-            if values[0] == values[1]:
-                value = 1
-            else:
-                value = 0
+            value = 1 if values[0] == values[1] else 0
         
         return value, version_total, i
 
