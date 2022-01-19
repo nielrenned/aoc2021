@@ -48,10 +48,6 @@ def regions_disjoint(region1, region2):
     (X0, X1), (Y0, Y1), (Z0, Z1) = region2
     return (X0 > x1 or x0 > X1 or Y0 > y1 or y0 > Y1 or z0 > Z1 or Z0 > z1)
 
-def region_contains(larger, smaller):
-    (x0, x1), (y0, y1), (z0, z1) = larger
-    (X0, X1), (Y0, Y1), (Z0, Z1) = smaller
-    return ((x0 <= X0 and X1 <= x1) and (y0 <= Y0 and Y1 <= y1) and (z0 <= Z0 and Z1 <= z1))
 
 def get_intersection(region1, region2):
     if regions_disjoint(region1, region2):
@@ -68,16 +64,41 @@ def region_size(region):
     (x0, x1), (y0, y1), (z0, z1) = region
     return (x1-x0+1)*(y1-y0+1)*(z1-z0+1)
 
-def subtract_regions(region1, region2):
-    if regions_disjoint(region1, region2):
-        return [region1]
-
+'''
+  This idea is effectively implementing DeMorgan's law, but on a grand scale.
+  The clever trick of adding "negative cuboids" was something I found online.
+  For the _life_ of me, I couldn't figure out how to solve this without keeping track of the
+  sets manually, so thanks to reddit for helping me get through it.
+'''
 def part2():
-    q = []
-    
+    regions = []
+    for instr, next_region in INPUT:
+        next_value = 1 if instr == 'on' else -1
+        
+        new_regions = []
+        for region, value in regions:
+            intersection = get_intersection(region, next_region)
+            if intersection is None:
+                continue
+            
+            intersection_value = 0
+            if value == next_value:
+                intersection_value = -next_value
+            elif next_value == 1 and value == -1:
+                intersection_value = 1
+            elif next_value == -1 and value == 1:
+                intersection_value = -1
+            
+            new_regions.append((intersection, intersection_value))
+        regions += new_regions
+        
+        if instr == 'on':
+            regions.append((next_region, 1))
+            
+    return sum(region_size(region) * value for region, value in regions)
 
 def main():
-    load_input(True)
+    load_input()
     parse_input()
     print('PART 1:', part1())
     print('PART 2:', part2())
