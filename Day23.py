@@ -72,29 +72,24 @@ def get_reachable_states(state):
             yield (new_state, cost)
 
 def get_valid_next_positions(state, start_pos):
-    valid_positions = set()
-    
     amphipod_letter = state[sindex(start_pos)]
     room_x_value = room_x_values[amphipod_letter]
     
-    can_enter_desired_room = True
+    allowed_to_enter_desired_room = True
     for y in range(-4, 0):
         letter = state[sindex(room_x_value, y)]
         if letter != '.' and letter != amphipod_letter:
-            can_enter_desired_room = False
-    
-    # if we're in the hallway, we can only go to our desired room
-    if start_pos[1] == 0:
-        if can_enter_desired_room:
-            for y in range(0, -5, -1):
-                if state[sindex(room_x_value, y)] != '.':
-                    break
-            return {(room_x_value, y+1)}
-        else:
-            return set()
+            allowed_to_enter_desired_room = False
+            break
+        
+    # if we're in the hallway, we can move if we can
+    # go to our desired room
+    if start_pos[1] == 0 and not allowed_to_enter_desired_room:
+        return set()
     
     # if we're not in the hallway, then try to leave the room
     x0, y0 = start_pos
+    reachable_positions = set()
     
     # leave room
     # return {} if blocked
@@ -109,7 +104,7 @@ def get_valid_next_positions(state, start_pos):
         if state[sindex(x0, y0)] != '.':
             break
         if x0 != 2 and x0 != 4 and x0 != 6 and x0 != 8:
-            valid_positions.add((x0, y0))
+            reachable_positions.add((x0, y0))
     
     # walk right as far as possible
     x0 = start_pos[0]
@@ -118,17 +113,29 @@ def get_valid_next_positions(state, start_pos):
         if state[sindex(x0, y0)] != '.':
             break
         if x0 != 2 and x0 != 4 and x0 != 6 and x0 != 8:
-            valid_positions.add((x0, y0))
+            reachable_positions.add((x0, y0))
     
     # try to enter desired room, if possible
     # and go to the lowest position
-    if can_enter_desired_room and ((room_x_value-1, 0) in valid_positions or (room_x_value+1, 0) in valid_positions):
-        for y in range(0, -5, -1):
-            if state[sindex(room_x_value, y)] != '.':
-                break
-        valid_positions.add((room_x_value, y+1))
+    good_y_value = -4
+    for y in range(0, -5, -1):
+        if state[sindex(room_x_value, y)] != '.':
+            good_y_value = y+1
+            break
+    lowest_room_position = (room_x_value, good_y_value)
     
-    return valid_positions
+    if allowed_to_enter_desired_room and \
+       ((room_x_value-1, 0) in reachable_positions or \
+        (room_x_value+1, 0) in reachable_positions or \
+        (room_x_value+1, 0) == start_pos or \
+        (room_x_value-1, 0) == start_pos):
+        
+        reachable_positions.add(lowest_room_position)
+    
+    if start_pos[1] == 0:
+        return reachable_positions & {lowest_room_position}
+        
+    return reachable_positions
 
 def is_finished(state):
     return state == '...........ABCDABCDABCDABCD'
@@ -153,6 +160,8 @@ def a_star(starting_state):
     open_set = [(finishing_heuristic(starting_state), starting_state)]
     heapify(open_set)
     
+    came_from = {starting_state: None}
+    
     g_score = defaultdict(lambda: 1000000)
     g_score[starting_state] = 0
     
@@ -162,12 +171,26 @@ def a_star(starting_state):
     while len(open_set) > 0:
         _, current = heappop(open_set)
         
+        #print(g_score[current])
+        #print_state(current)
+        
         if is_finished(current):
+            path = []
+            prev = current
+            while prev is not None:
+                path.insert(0, prev)
+                prev = came_from[prev]
+            
+            for state in path:
+                print(g_score[state])
+                print_state(state)
+            
             return g_score[current]
         
         for neighbor, d in get_reachable_states(current):
             tentative_g_score = g_score[current] + d
             if tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
                 heur = finishing_heuristic(neighbor)
                 f_score[neighbor] = tentative_g_score + heur
@@ -178,11 +201,22 @@ def part1():
     return a_star(starting_state)
 
 def part2():
+    '''test_input = 'AA.D.B.B.BDB...D.C.D.CCA.CA'
+    
+    print_state(test_input)
+    
+    print(get_valid_next_positions(test_input, (5,0)))
+    
+    print()
+    
+    for state, _ in get_reachable_states(test_input):
+        print_state(state)'''
+    
     starting_state = '.' * 11 + ''.join(INPUT[:4]) + 'DCBADBAC' + ''.join(INPUT[4:])
     return a_star(starting_state)
 
 def main():
-    load_input(True)
+    load_input()
     parse_input()
     print('PART 1:', part1())
     print('PART 2:', part2())
