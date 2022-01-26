@@ -45,7 +45,7 @@ def part2():
     state_counts = {((p1_start, p2_start), (0, 0), 0): 1}
     end_counts = [0,0]
     # state will be a tuple of the form ((p1_pos, p2_pos), (p1_score, p2_score), whose_turn)
-    print(state_counts)
+    #print(state_counts)
     while True:
         new_state_counts = defaultdict(int)
         for state in state_counts:
