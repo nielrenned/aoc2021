@@ -2,6 +2,19 @@ DAY = 23
 RAW_INPUT = None
 INPUT = None
 
+'''
+  This problem was HARD for me. The first version I made _worked_ (I think), but was incredibly slow.
+  A major optimization came from storing the map states as strings! This required a "clever"
+  indexing function, but other than that, didn't change the code much.
+  The largest problem for me though, was correctly calculating the reachable positions for any
+  amphipod in the map. For a while they could teleport through each other, and move within the 
+  hallway, neither of which should be possible. Once these issues were fixed, we were all set!
+  
+  The code is still pretty slow in my opinion. Some of that is Python's fault, I think. But most of
+  it is probably on me. However, I don't really feel the need to opimize it. My solution is calculated
+  in less than 10 seconds, which is plenty fast for me.
+'''
+
 def load_input(use_test_input=False):
     global RAW_INPUT
     path = f'inputs/day{DAY}.txt'
@@ -171,20 +184,7 @@ def a_star(starting_state):
     while len(open_set) > 0:
         _, current = heappop(open_set)
         
-        #print(g_score[current])
-        #print_state(current)
-        
         if is_finished(current):
-            path = []
-            prev = current
-            while prev is not None:
-                path.insert(0, prev)
-                prev = came_from[prev]
-            
-            for state in path:
-                print(g_score[state])
-                print_state(state)
-            
             return g_score[current]
         
         for neighbor, d in get_reachable_states(current):
@@ -201,17 +201,6 @@ def part1():
     return a_star(starting_state)
 
 def part2():
-    '''test_input = 'AA.D.B.B.BDB...D.C.D.CCA.CA'
-    
-    print_state(test_input)
-    
-    print(get_valid_next_positions(test_input, (5,0)))
-    
-    print()
-    
-    for state, _ in get_reachable_states(test_input):
-        print_state(state)'''
-    
     starting_state = '.' * 11 + ''.join(INPUT[:4]) + 'DCBADBAC' + ''.join(INPUT[4:])
     return a_star(starting_state)
 
